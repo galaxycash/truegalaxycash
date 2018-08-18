@@ -1,0 +1,200 @@
+# Copyright (c) 2009-2010 Satoshi Nakamoto
+# Copyright (c) 2017-2018 The GalaxyCash developers
+# Distributed under the MIT/X11 software license, see the accompanying
+# file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
+USE_UPNP:=0
+USE_WALLET:=1
+STATIC:=1
+
+LINK:=$(CXX)
+ARCH:=$(system lscpu | head -n 1 | awk '{print $2}')
+
+DEFS=-D_MT -DWIN32 -D_WINDOWS -DBOOST_THREAD_USE_LIB -DBOOST_SPIRIT_THREADSAFE -DBOOST_NO_CXX11_SCOPED_ENUMS -DBOOST_ASIO_ENABLE_OLD_SERVICES -DGALAXYCASH_DAEMON
+
+DEFS += $(addprefix -I,$(CURDIR) $(CURDIR)/obj $(BOOST_INCLUDE_PATH) $(BDB_INCLUDE_PATH) $(OPENSSL_INCLUDE_PATH))
+LIBS = $(addprefix -L,$(BOOST_LIB_PATH) $(BDB_LIB_PATH) $(OPENSSL_LIB_PATH))
+
+CFLAGS=-O2 $(DEBUGFLAGS) $(DEFS) $(INCLUDEPATHS) -std=c99
+LDFLAGS=-Wl,--dynamicbase -Wl,--nxcompat -static -static-libgcc -static-libstdc++
+
+LMODE = static
+LMODE2 = static
+
+BOOST_LIB_SUFFIX:=-mt
+BDB_LIB_SUFFIX:=-4.8
+
+# for boost 1.37, add -mt to the boost libraries
+LIBS += \
+ -Wl,-B$(LMODE) \
+   -lboost_chrono$(BOOST_LIB_SUFFIX) \
+   -lboost_system$(BOOST_LIB_SUFFIX) \
+   -lboost_filesystem$(BOOST_LIB_SUFFIX) \
+   -lboost_program_options$(BOOST_LIB_SUFFIX) \
+   -lboost_thread$(BOOST_LIB_SUFFIX) \
+   -ldb_cxx$(BDB_LIB_SUFFIX) \
+   -lssl \
+   -lcrypto \
+   -lz
+
+ifndef USE_UPNP
+	override USE_UPNP = -
+endif
+ifneq (${USE_UPNP}, -)
+	LIBS += -lminiupnpc -liphlpapi
+	DEFS += -DMINIUPNP_STATICLIB -DSTATICLIB -DUSE_UPNP=$(USE_UPNP)
+endif
+
+LIBS += -lkernel32 -luser32 -lgdi32 -lcomdlg32 -lwinspool -lwinmm -lshell32 -lcomctl32 -lole32 -loleaut32 -luuid -lrpcrt4 -ladvapi32 -lws2_32 -lmswsock -lshlwapi
+
+
+DEBUGFLAGS=-g
+
+
+ifeq (${ARCH}, i686)
+    EXT_OPTIONS=-msse2
+endif
+
+
+# CXXFLAGS can be specified on the make command line, so we use xCXXFLAGS that only
+# adds some defaults in front. Unfortunately, CXXFLAGS=... $(CXXFLAGS) does not work.
+xCXXFLAGS=-O2 -std=gnu++11 $(EXT_OPTIONS) -pthread -Wall -Wextra -Wno-ignored-qualifiers -Wformat -Wformat-security -Wno-unused-parameter \
+    $(DEBUGFLAGS) $(DEFS) $(HARDENING) $(CXXFLAGS)
+
+# LDFLAGS can be specified on the make command line, so we use xLDFLAGS that only
+# adds some defaults in front. Unfortunately, LDFLAGS=... $(LDFLAGS) does not work.
+xLDFLAGS=$(LDHARDENING) $(LDFLAGS)
+
+OBJS= \
+    obj/arith_uint256.o \
+    obj/version.o \
+    obj/checkpoints.o \
+    obj/netbase.o \
+    obj/addrman.o \
+    obj/crypter.o \
+    obj/key.o \
+    obj/init.o \
+    obj/galaxycashd.o \
+    obj/keystore.o \
+    obj/core.o \
+    obj/main.o \
+    obj/net.o \
+    obj/protocol.o \
+    obj/rpcclient.o \
+    obj/rpcprotocol.o \
+    obj/rpcserver.o \
+    obj/rpcmisc.o \
+    obj/rpcnet.o \
+    obj/rpcblockchain.o \
+    obj/rpcrawtransaction.o \
+    obj/timedata.o \
+    obj/script.o \
+    obj/sync.o \
+    obj/txmempool.o \
+    obj/util.o \
+    obj/hash.o \
+    obj/noui.o \
+    obj/kernel.o \
+    obj/chainparams.o \
+    obj/aes_helper.o \
+    obj/blake.o \
+    obj/bmw.o \
+    obj/cubehash.o \
+    obj/fugue.o \
+    obj/hamsi.o \
+    obj/hamsi_helper.o \
+    obj/panama.o \
+    obj/sha0.o \
+    obj/sha1.o \
+    obj/sha2.o \
+    obj/sha2big.o \
+    obj/echo.o \
+    obj/groestl.o \
+    obj/jh.o \
+    obj/keccak.o \
+    obj/luffa.o \
+    obj/shavite.o \
+    obj/simd.o \
+    obj/ripemd.o \
+    obj/skein.o \
+    obj/blake2s-ref.o \
+    obj/masternode.o \
+    obj/activemasternode.o \
+    obj/activemasternodeman.o \
+    obj/masternodeman.o \
+    obj/masternodeconfig.o \
+    obj/masternode-payments.o \
+    obj/rpcmasternode.o \
+    obj/spork.o \
+    obj/blockfile.o
+
+ifeq (${USE_WALLET}, 1)
+    DEFS += -DENABLE_WALLET
+    OBJS += \
+        obj/db.o \
+        obj/miner.o \
+        obj/rpcdump.o \
+        obj/rpcmining.o \
+        obj/rpcwallet.o \
+        obj/wallet.o \
+        obj/walletdb.o
+endif
+
+all: galaxycashd.exe
+
+LIBS += $(CURDIR)/leveldb/libleveldb.a $(CURDIR)/leveldb/libmemenv.a
+DEFS += -I"$(CURDIR)/leveldb/include"
+DEFS += -I"$(CURDIR)/leveldb/helpers"
+OBJS += obj/txdb-leveldb.o
+leveldb/libleveldb.a:
+	@echo "Building LevelDB ..." && cd leveldb && CC=$(CC) CXX=$(CXX) TARGET_OS=OS_WINDOWS_CROSSCOMPILE CXXFLAGS="-I$(INCLUDEPATHS)" LDFLAGS="-L$(LIBPATHS)" $(MAKE) libleveldb.a libmemenv.a && $(RANLIB) libleveldb.a && $(RANLIB) libmemenv.a && cd ..
+obj/txdb-leveldb.o: leveldb/libleveldb.a
+
+# auto-generated dependencies:
+-include obj/*.P
+
+obj/build.h: FORCE
+	/bin/sh ../share/genbuild.sh obj/build.h
+version.cpp: obj/build.h
+DEFS += -DHAVE_BUILD_INFO
+
+
+obj/%.o: %.cpp
+	$(CXX) -c $(xCXXFLAGS) -MMD -MF $(@:%.o=%.d) -o $@ $<
+	@cp $(@:%.o=%.d) $(@:%.o=%.P); \
+	  sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+	      -e '/^$$/ d' -e 's/$$/ :/' < $(@:%.o=%.d) >> $(@:%.o=%.P); \
+	  rm -f $(@:%.o=%.d)
+
+obj/%.o: %.c
+	$(CXX) -c $(xCXXFLAGS) -fpermissive -MMD -MF $(@:%.o=%.d) -o $@ $<
+	@cp $(@:%.o=%.d) $(@:%.o=%.P); \
+	  sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+	      -e '/^$$/ d' -e 's/$$/ :/' < $(@:%.o=%.d) >> $(@:%.o=%.P); \
+	  rm -f $(@:%.o=%.d)
+
+obj/%.o: crypto/%.cpp
+	$(CXX) -c $(xCXXFLAGS) -MMD -MF $(@:%.o=%.d) -o $@ $<
+	@cp $(@:%.o=%.d) $(@:%.o=%.P); \
+	  sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+	      -e '/^$$/ d' -e 's/$$/ :/' < $(@:%.o=%.d) >> $(@:%.o=%.P); \
+	  rm -f $(@:%.o=%.d)
+
+obj/%.o: crypto/%.c
+	$(CXX) -c $(xCXXFLAGS) -fpermissive -MMD -MF $(@:%.o=%.d) -o $@ $<
+	@cp $(@:%.o=%.d) $(@:%.o=%.P); \
+	  sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+	      -e '/^$$/ d' -e 's/$$/ :/' < $(@:%.o=%.d) >> $(@:%.o=%.P); \
+	  rm -f $(@:%.o=%.d)
+
+
+galaxycashd.exe: $(OBJS:obj/%=obj/%)
+	$(LINK) $(xCXXFLAGS) -o $@ $^ $(xLDFLAGS) $(LIBS)
+
+clean:
+	-rm -f galaxycashd.exe
+	-rm -f obj/*.o
+	-rm -f obj/*.P
+	-rm -f obj/build.h
+
+FORCE:
