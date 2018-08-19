@@ -1107,9 +1107,15 @@ void ThreadDNSAddressSeed()
             CSemaphoreGrant grant(*semOutbound);
 
 
-            if (OpenNetworkConnection(addr, &grant, seed.host.c_str()))
+            if (OpenNetworkConnection(addr, &grant, seed.host.c_str())) {
                 addrman.Add(addr, CNetAddr(seed.name, true));
-            else
+
+                LOCK(cs_vNodes);
+                if (vNodes.size() >= 2) {
+                    LogPrintf("P2P peers available. Skipped DNS seeding.\n");
+                    return;
+                }
+            } else
                 break;
         }
     }
