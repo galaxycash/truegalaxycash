@@ -208,6 +208,7 @@ Value stop(const Array& params, bool fHelp)
     return "TrueGalaxyCash server stopping";
 }
 
+extern Value clearbans(const Array& params, bool fHelp);
 
 static const CRPCCommand vRPCCommands[] =
 { //  name                      actor (function)         okSafeMode threadSafe reqWallet
@@ -254,6 +255,7 @@ static const CRPCCommand vRPCCommands[] =
     { "getsupply",              &getsupply,              true, 	    false,	   false },
     { "getmaxmoney",            &getmaxmoney,            true, 	    false,	   false },
     { "getreward",              &getreward,              true, 	    false,	   false },
+    { "clearbans",              &clearbans,              true, 	    false,	   false },
 
 #ifdef ENABLE_WALLET
     { "getgenerate",            &getgenerate,            true, 	    false,	   true },

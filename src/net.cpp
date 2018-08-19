@@ -476,7 +476,7 @@ bool CNode::Misbehaving(int howmuch)
     nMisbehavior += howmuch;
     if (nMisbehavior >= GetArg("-banscore", 100))
     {
-        int64_t banTime = GetTime()+GetArg("-bantime", 60*60*24);  // Default 24-hour ban
+        int64_t banTime = GetTime()+GetArg("-bantime", 60 * 2);  // Default 24-hour ban
         LogPrintf("Misbehaving: %s (%d -> %d) DISCONNECTING\n", addr.ToString(), nMisbehavior-howmuch, nMisbehavior);
         {
             LOCK(cs_setBanned);
@@ -1108,15 +1108,14 @@ void ThreadDNSAddressSeed()
 
 
             if (OpenNetworkConnection(addr, &grant, seed.host.c_str())) {
-                addrman.Add(addr, CNetAddr(seed.name, true));
+                addrman.Add(addr, CNetAddr("127.0.0.1"));
 
                 LOCK(cs_vNodes);
                 if (vNodes.size() >= 2) {
                     LogPrintf("P2P peers available. Skipped DNS seeding.\n");
                     return;
                 }
-            } else
-                break;
+            }
         }
     }
 

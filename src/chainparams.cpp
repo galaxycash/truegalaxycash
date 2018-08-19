@@ -98,7 +98,7 @@ public:
 
         hashGenesisBlock = genesis.GetHash();
 
-        int counter = 0;
+        /*int counter = 0;
         while (true) {
 
             if (genesis.GetPoWHash() <= powLimit)
@@ -116,6 +116,7 @@ public:
         std::cout << "Hash is " << genesis.GetHash().ToString() << std::endl;
         std::cout << "PoW Hash is " << genesis.GetPoWHash().ToString() << std::endl;
         std::cout << "Marktle is " << genesis.hashMerkleRoot.ToString() << std::endl;
+        */
 
         assert(hashGenesisBlock == uint256S("0x576c1b6eb8af58d39dcb6b26ec3452ee67ea59b40caba04f7c6f393d1756eeed"));
         assert(genesis.hashMerkleRoot == uint256S("0xa96e9aedccdd0274da597eddfa26440b7495dcdfcbfe55d562adcb9ab7d9ef22"));

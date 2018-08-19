@@ -316,6 +316,13 @@ Value getnetworkinfo(const Array& params, bool fHelp)
     return obj;
 }
 
+
+Value clearbans(const Array& params, bool fHelp)
+{
+    CNode::ClearBanned();
+    return true;
+}
+
 #include "masternodeman.h"
 
 Value getnodes(const Array& params, bool fHelp)
