@@ -1104,7 +1104,7 @@ void ThreadDNSAddressSeed()
         (!GetBoolArg("-forcednsseed", false))) {
         MilliSleep(11 * 1000);
 
-        if (GetNumConnections() >= 3) {
+        if (GetNumConnections() >= 4) {
             LogPrintf("P2P peers available. Skipped DNS seeding.\n");
             return;
         }
@@ -1119,21 +1119,20 @@ void ThreadDNSAddressSeed()
         if (HaveNameProxy()) {
             AddOneShot(seed.host);
         } else {
-            vector<CService> vIPs;
+            vector<CNetAddr> vIPs;
             vector<CAddress> vAdd;
-            if (Lookup(seed.host.c_str(), vIPs, Params().GetDefaultPort(), false))
+            if (LookupHost(seed.host.c_str(), vIPs))
             {
-                BOOST_FOREACH(CService& ip, vIPs)
+                BOOST_FOREACH(CNetAddr& ip, vIPs)
                 {
                     int nOneDay = 24*3600;
-                    CAddress addr = CAddress(ip);
+                    CAddress addr = CAddress(CService(ip, Params().GetDefaultPort()));
                     addr.nTime = GetTime() - 3*nOneDay - GetRand(4*nOneDay); // use a random age between 3 and 7 days old
                     vAdd.push_back(addr);
                     found++;
                 }
             }
             addrman.Add(vAdd, CNetAddr(seed.name, true));
-            // addrman.Add(vAdd, CNetAddr("127.0.0.1"));
         }
     }
 
@@ -1157,8 +1156,7 @@ void ThreadDNSAddressSeed()
                     found++;
                 }
             }
-            addrman.Add(vAdd, CNetAddr(sIP.c_str(), false));
-            // addrman.Add(vAdd, CNetAddr("127.0.0.1"));
+            addrman.Add(vAdd, CNetAddr(sIP.c_str(), true));
         }
     }
 
