@@ -1104,7 +1104,7 @@ void ThreadDNSAddressSeed()
         (!GetBoolArg("-forcednsseed", false))) {
         MilliSleep(11 * 1000);
 
-        if (GetNumConnections() >= 3) {
+        if (GetNumConnections() >= 2) {
             LogPrintf("P2P peers available. Skipped DNS seeding.\n");
             return;
         }
@@ -1121,7 +1121,7 @@ void ThreadDNSAddressSeed()
         } else {
             vector<CService> vIPs;
             vector<CAddress> vAdd;
-            if (Lookup(seed.host.c_str(), vIPs, Params().GetDefaultPort(), true, 1))
+            if (Lookup(seed.host.c_str(), vIPs, Params().GetDefaultPort(), false))
             {
                 BOOST_FOREACH(CService& ip, vIPs)
                 {
@@ -1136,6 +1136,14 @@ void ThreadDNSAddressSeed()
         }
     }
 
+
+    MilliSleep(5000);
+
+    if (GetNumConnections() >= 2) {
+        LogPrintf("P2P peers available. Skipped DNS seeding.\n");
+        return;
+    }
+
     std::vector <CMasternode> vMns = mnodeman.GetFullMasternodeVector();
 
     BOOST_FOREACH(CMasternode &mn, vMns) {
@@ -1143,31 +1151,18 @@ void ThreadDNSAddressSeed()
         CSemaphoreGrant grant(*semOutbound);
 
 
-        if (OpenNetworkConnection(addr, &grant, mn.addr.ToStringIPPort().c_str()));
-            found++;
-    }
+        std::string strNode = mn.addr.ToStringIPPort();
+        LOCK(cs_vAddedNodes);
+        vector<string>::iterator it = vAddedNodes.begin();
 
-    if (GetNumConnections() >= 3) {
-        LogPrintf("P2P peers available. Skipped DNS seeding.\n");
-        return;
-    }
+        for(; it != vAddedNodes.end(); it++)
+            if (strNode == *it)
+                break;
 
-    BOOST_FOREACH(const CDNSSeedData &seed, vSeeds) {
+        if (it != vAddedNodes.end())
+            continue;
 
-        if (!GetBoolArg("nodirectconnect", false))
-        {
-            CAddress addr;
-            CSemaphoreGrant grant(*semOutbound);
-
-            if (OpenNetworkConnection(addr, &grant, seed.host.c_str())) {
-                found++;
-
-                if (GetNumConnections() >= 3) {
-                    LogPrintf("P2P peers available. Skipped DNS seeding.\n");
-                    return;
-                }
-            }
-        }
+        vAddedNodes.push_back(strNode);
     }
 
     LogPrintf("%d addresses found from DNS seeds\n", found);
