@@ -1077,8 +1077,25 @@ void MapPort(bool)
 
 
 
+#include "masternodeman.h"
 
+int GetNumConnections() {
+    int found = 0;
 
+    LOCK(cs_vNodes);
+    for (int i = 0; i < vNodes.size(); i++) {
+        if (!vNodes[i]->fSuccessfullyConnected)
+            continue;
+        if (vNodes[i]->fDisconnect)
+            continue;
+        if (!vNodes[i]->fNetworkNode)
+            continue;
+
+        found++;
+    }
+
+    return found;
+}
 
 void ThreadDNSAddressSeed()
 {
@@ -1087,8 +1104,7 @@ void ThreadDNSAddressSeed()
         (!GetBoolArg("-forcednsseed", false))) {
         MilliSleep(11 * 1000);
 
-        LOCK(cs_vNodes);
-        if (vNodes.size() >= 2) {
+        if (GetNumConnections() >= 3) {
             LogPrintf("P2P peers available. Skipped DNS seeding.\n");
             return;
         }
@@ -1103,15 +1119,50 @@ void ThreadDNSAddressSeed()
         if (HaveNameProxy()) {
             AddOneShot(seed.host);
         } else {
+            vector<CService> vIPs;
+            vector<CAddress> vAdd;
+            if (Lookup(seed.host.c_str(), vIPs, Params().GetDefaultPort(), true, 1))
+            {
+                BOOST_FOREACH(CService& ip, vIPs)
+                {
+                    int nOneDay = 24*3600;
+                    CAddress addr = CAddress(ip);
+                    addr.nTime = GetTime() - 3*nOneDay - GetRand(4*nOneDay); // use a random age between 3 and 7 days old
+                    vAdd.push_back(addr);
+                    found++;
+                }
+            }
+            addrman.Add(vAdd, CNetAddr(seed.name, true));
+        }
+    }
+
+    std::vector <CMasternode> vMns = mnodeman.GetFullMasternodeVector();
+
+    BOOST_FOREACH(CMasternode &mn, vMns) {
+        CAddress addr;
+        CSemaphoreGrant grant(*semOutbound);
+
+
+        if (OpenNetworkConnection(addr, &grant, mn.addr.ToStringIPPort().c_str()));
+            found++;
+    }
+
+    if (GetNumConnections() >= 3) {
+        LogPrintf("P2P peers available. Skipped DNS seeding.\n");
+        return;
+    }
+
+    BOOST_FOREACH(const CDNSSeedData &seed, vSeeds) {
+
+        if (!GetBoolArg("nodirectconnect", false))
+        {
             CAddress addr;
             CSemaphoreGrant grant(*semOutbound);
 
-
             if (OpenNetworkConnection(addr, &grant, seed.host.c_str())) {
-                addrman.Add(addr, CNetAddr("127.0.0.1"));
+                found++;
 
-                LOCK(cs_vNodes);
-                if (vNodes.size() >= 2) {
+                if (GetNumConnections() >= 3) {
                     LogPrintf("P2P peers available. Skipped DNS seeding.\n");
                     return;
                 }
