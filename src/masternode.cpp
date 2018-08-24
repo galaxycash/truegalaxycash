@@ -175,6 +175,7 @@ void CMasternode::Check()
     TRY_LOCK(cs_main, lockRecv);
     if(!lockRecv) return;
 
+
     //once spent, stop doing the checks
     if(activeState == MASTERNODE_VIN_SPENT) return;
 

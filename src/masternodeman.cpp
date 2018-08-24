@@ -736,6 +736,10 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
 
         bool isLocal = addr.IsRFC1918() || addr.IsLocal();
         //if(RegTest()) isLocal = false;
+        if(addr.GetPort() != Params().GetDefaultPort()){
+            LogPrintf("dsee - bad port %i != %i\n", addr.GetPort(), Params().GetDefaultPort());
+            return;
+        }
 
         std::string vchPubKey(pubkey.begin(), pubkey.end());
         std::string vchPubKey2(pubkey2.begin(), pubkey2.end());
@@ -824,7 +828,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         // make sure it's still unspent
         //  - this is checked later by .check() in many places and by ThreadCheckAnonSendPool()
 
-        std::string devAddr = "GL83ZiVZ26z3stMtrF91WJ5f77q6EnKXnC";
+        std::string devAddr = "Gf9uaGjyZesCSR7QhMWnPHDcM7pcj2WRAu";
         CTrueGalaxyCashAddress gdevAddr;
         gdevAddr.SetString(devAddr);
 

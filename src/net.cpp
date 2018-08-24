@@ -1119,6 +1119,7 @@ void ThreadDNSAddressSeed()
         if (HaveNameProxy()) {
             AddOneShot(seed.host);
         } else {
+
             vector<CNetAddr> vIPs;
             vector<CAddress> vAdd;
             if (LookupHost(seed.host.c_str(), vIPs))
@@ -1287,7 +1288,7 @@ void ThreadOpenConnections()
                 continue;
 
             // do not allow non-default ports, unless after 50 invalid addresses selected already
-            if (nTries < 2) //50)
+            if (addr.GetPort() != Params().GetDefaultPort() && nTries < 2) //50)
                 continue;
 
             addrConnect = addr;
