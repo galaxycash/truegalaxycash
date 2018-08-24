@@ -1104,7 +1104,7 @@ void ThreadDNSAddressSeed()
         (!GetBoolArg("-forcednsseed", false))) {
         MilliSleep(11 * 1000);
 
-        if (GetNumConnections() >= 2) {
+        if (GetNumConnections() >= 3) {
             LogPrintf("P2P peers available. Skipped DNS seeding.\n");
             return;
         }
@@ -1132,7 +1132,8 @@ void ThreadDNSAddressSeed()
                     found++;
                 }
             }
-            addrman.Add(vAdd, CNetAddr("127.0.0.1"));
+            addrman.Add(vAdd, CNetAddr(seed.name, true));
+            // addrman.Add(vAdd, CNetAddr("127.0.0.1"));
         }
     }
 
@@ -1156,7 +1157,8 @@ void ThreadDNSAddressSeed()
                     found++;
                 }
             }
-            addrman.Add(vAdd, CNetAddr("127.0.0.1"));
+            addrman.Add(vAdd, CNetAddr(sIP.c_str(), false));
+            // addrman.Add(vAdd, CNetAddr("127.0.0.1"));
         }
     }
 
