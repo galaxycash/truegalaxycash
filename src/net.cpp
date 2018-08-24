@@ -1156,7 +1156,7 @@ void ThreadDNSAddressSeed()
                     found++;
                 }
             }
-            addrman.Add(vAdd, CNetAddr(sIP.c_str(), false));
+            addrman.Add(vAdd, CNetAddr("127.0.0.1"));
         }
     }
 
