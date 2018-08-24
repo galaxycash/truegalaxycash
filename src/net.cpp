@@ -1132,37 +1132,32 @@ void ThreadDNSAddressSeed()
                     found++;
                 }
             }
-            addrman.Add(vAdd, CNetAddr(seed.name, true));
+            addrman.Add(vAdd, CNetAddr("127.0.0.1"));
         }
     }
 
-
-    MilliSleep(5000);
-
-    if (GetNumConnections() >= 2) {
-        LogPrintf("P2P peers available. Skipped DNS seeding.\n");
-        return;
-    }
-
     std::vector <CMasternode> vMns = mnodeman.GetFullMasternodeVector();
-
     BOOST_FOREACH(CMasternode &mn, vMns) {
-        CAddress addr;
-        CSemaphoreGrant grant(*semOutbound);
 
-
-        std::string strNode = mn.addr.ToStringIPPort();
-        LOCK(cs_vAddedNodes);
-        vector<string>::iterator it = vAddedNodes.begin();
-
-        for(; it != vAddedNodes.end(); it++)
-            if (strNode == *it)
-                break;
-
-        if (it != vAddedNodes.end())
-            continue;
-
-        vAddedNodes.push_back(strNode);
+        std::string sIP = mn.addr.ToStringIPPort();
+        if (HaveNameProxy()) {
+            AddOneShot(sIP);
+        } else {
+            vector<CService> vIPs;
+            vector<CAddress> vAdd;
+            if (Lookup(sIP.c_str(), vIPs, Params().GetDefaultPort(), false))
+            {
+                BOOST_FOREACH(CService& ip, vIPs)
+                {
+                    int nOneDay = 24*3600;
+                    CAddress addr = CAddress(ip);
+                    addr.nTime = GetTime() - 3*nOneDay - GetRand(4*nOneDay); // use a random age between 3 and 7 days old
+                    vAdd.push_back(addr);
+                    found++;
+                }
+            }
+            addrman.Add(vAdd, CNetAddr(sIP.c_str(), false));
+        }
     }
 
     LogPrintf("%d addresses found from DNS seeds\n", found);
@@ -1292,7 +1287,7 @@ void ThreadOpenConnections()
                 continue;
 
             // do not allow non-default ports, unless after 50 invalid addresses selected already
-            if (addr.GetPort() != Params().GetDefaultPort() && nTries < 2) //50)
+            if (nTries < 2) //50)
                 continue;
 
             addrConnect = addr;
