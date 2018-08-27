@@ -106,18 +106,31 @@ const string strMessageMagic = "TrueGalaxyCash Signed Message:\n";
 //
 // Burn list
 //
-const static uint256 aBurnedCoins[] =
+
+struct CBurnedCoin {
+    uint256     hash;
+    uint32_t    index;
+};
+
+const static CBurnedCoin aBurnedCoins[] =
 {
 };
 
-bool IsBurned(const uint256 &txid) {
+bool IsBurned(const uint256 &hash, uint32_t index) {
+    for (uint32_t i = 0; i < sizeof(aBurnedCoins) / sizeof(aBurnedCoins[0]); i++) {
+        if (aBurnedCoins[i].hash == hash && aBurnedCoins[i].index == index)
+            return true;
+    }
     return false;
 }
 
 bool IsBurned(const CTxIn &vin) {
-    return IsBurned(vin.prevout.hash);
+    return IsBurned(vin.prevout.hash, vin.prevout.n);
 }
 
+bool IsBurned(const COutPoint &coin) {
+    return IsBurned(coin.hash, coin.n);
+}
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -752,8 +765,13 @@ bool CTransaction::CheckTransaction() const
     else
     {
         BOOST_FOREACH(const CTxIn& txin, vin)
+        {
+            if (IsBurned(txin.prevout.hash, txin.prevout.n))
+                return DoS(100, error("CTransaction::CheckTransaction() : prevout is burned"));
+
             if (txin.prevout.IsNull())
                 return DoS(10, error("CTransaction::CheckTransaction() : prevout is null"));
+        }
     }
 
     return true;
@@ -1872,7 +1890,7 @@ bool CBlock::DisconnectBlock(CTxDB& txdb, CBlockIndex* pindex)
     BOOST_FOREACH(CTransaction& tx, vtx)
         SyncWithWallets(tx, this, false);
 
-    if (GetBoolArg("-coins", false))
+    if (GetBoolArg("-coins", true))
         pCoins->DisconnectBlock(this);
 
     return true;
@@ -2024,7 +2042,7 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
     BOOST_FOREACH(CTransaction& tx, vtx)
         SyncWithWallets(tx, this);
 
-    if (GetBoolArg("-coins", false))
+    if (GetBoolArg("-coins", true))
         pCoins->ConnectBlock(this);
 
     return true;

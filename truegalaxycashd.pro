@@ -182,7 +182,8 @@ HEADERS += src/addrman.h \
     src/spork.h \
     src/blockfile.h \
     src/coins.h \
-    src/leveldbwrapper.h
+    src/leveldbwrapper.h \
+    src/smartchain.h
 
 SOURCES += src/truegalaxycashd.cpp \
     src/kernel.cpp \
@@ -253,7 +254,8 @@ SOURCES += src/truegalaxycashd.cpp \
     src/crypto/blake2s-ref.c \
     src/blockfile.cpp \
     src/coins.cpp \
-    src/leveldbwrapper.cpp
+    src/leveldbwrapper.cpp \
+    src/smartchain.cpp
 
 
 # "Other files" to show in Qt Creator

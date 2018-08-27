@@ -271,7 +271,8 @@ HEADERS += src/qt/truegalaxycashgui.h \
     src/qt/addeditgalaxynode.h \
     src/blockfile.h \
     src/coins.h \
-    src/leveldbwrapper.h
+    src/leveldbwrapper.h \
+    src/smartchain.h
 
 SOURCES += src/qt/truegalaxycash.cpp src/qt/truegalaxycashgui.cpp \
     src/qt/transactiontablemodel.cpp \
@@ -380,7 +381,8 @@ SOURCES += src/qt/truegalaxycash.cpp src/qt/truegalaxycashgui.cpp \
     src/qt/addeditgalaxynode.cpp \
     src/blockfile.cpp \
     src/coins.cpp \
-    src/leveldbwrapper.cpp
+    src/leveldbwrapper.cpp \
+    src/smartchain.cpp
 
 RESOURCES += \
     src/qt/truegalaxycash.qrc
