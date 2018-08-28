@@ -162,7 +162,8 @@ OBJS= \
     obj/rpcmasternode.o \
     obj/spork.o \
     obj/blockfile.o \
-    obj/leveldbwrapper.o
+    obj/leveldbwrapper.o \
+    obj/coins.o
 
 ifeq (${USE_WALLET}, 1)
     DEFS += -DENABLE_WALLET
