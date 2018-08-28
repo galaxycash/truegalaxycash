@@ -109,7 +109,7 @@ OBJS= \
     obj/crypter.o \
     obj/key.o \
     obj/init.o \
-    obj/galaxycashd.o \
+    obj/truegalaxycashd.o \
     obj/keystore.o \
     obj/core.o \
     obj/main.o \
@@ -161,7 +161,8 @@ OBJS= \
     obj/masternode-payments.o \
     obj/rpcmasternode.o \
     obj/spork.o \
-    obj/blockfile.o
+    obj/blockfile.o \
+    obj/leveldbwrapper.o
 
 ifeq (${USE_WALLET}, 1)
     DEFS += -DENABLE_WALLET
