@@ -269,6 +269,16 @@ QJsonDocument callJson(const char *url, QWidget *parent) {
     return response;
 }
 
+
+uint32_t GetAccumulatedBlockTime() {
+    if (!pindexBest || pindexBest->pprev)
+        return 60;
+
+    return pindexBest->nTime - pindexBest->pprev->nTime;
+}
+
+#include "masternodeman.h"
+
 void OverviewPage::updatePrices()
 {
     const char *cryptohubStats = "https://cryptohub.online/api/market/ticker/TGCH/";
@@ -414,6 +424,11 @@ void OverviewPage::updatePrices()
     double TOTAL_BTC = TGCH_BALANCE * TGCH_BTC;
     double TOTAL_ETH = TGCH_BALANCE * TGCH_ETH;
 
+    uint32_t daily = 24 * 60 * 60;
+    uint32_t blocks = daily / GetAccumulatedBlockTime();
+    uint32_t blocksPerNode = blocks / mnodeman.CountEnabled();
+
+
     std::stringstream totbtcval;
     totbtcval << std::fixed << setprecision(8) << TOTAL_BTC;
     stats += std::string("\nBitcoin Value:") + totbtcval.str() + std::string(" ");
@@ -421,5 +436,20 @@ void OverviewPage::updatePrices()
     std::stringstream totethval;
     totethval << std::fixed << setprecision(8) << TOTAL_ETH;
     stats += std::string("Ethereum Value:") + totethval.str() + std::string(" ");
+
+
+    std::stringstream totdval;
+    totdval << std::fixed << setprecision(8) << (blocksPerNode * 0.8);
+    stats += std::string("\nDaily income:") + totdval.str() + std::string(" TGCH ");
+
+    std::stringstream totwval;
+    totwval << std::fixed << setprecision(8) << (blocksPerNode * 7 * 0.8);
+    stats += std::string("Weekly income:") + totwval.str() + std::string(" TGCH ");
+
+    std::stringstream totmval;
+    totmval << std::fixed << setprecision(8) << (blocksPerNode * 30 * 0.8);
+    stats += std::string("Monthly income:") + totmval.str() + std::string(" TGCH ");
+
+
     ui->priceStats->setText(QString::fromStdString(stats));
 }

@@ -1890,7 +1890,7 @@ bool CBlock::DisconnectBlock(CTxDB& txdb, CBlockIndex* pindex)
     BOOST_FOREACH(CTransaction& tx, vtx)
         SyncWithWallets(tx, this, false);
 
-    if (GetBoolArg("-coins", true))
+    if (GetBoolArg("-coins", false))
         pCoins->DisconnectBlock(this);
 
     return true;
@@ -2042,7 +2042,7 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
     BOOST_FOREACH(CTransaction& tx, vtx)
         SyncWithWallets(tx, this);
 
-    if (GetBoolArg("-coins", true))
+    if (GetBoolArg("-coins", false))
         pCoins->ConnectBlock(this);
 
     return true;
