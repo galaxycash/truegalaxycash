@@ -177,6 +177,12 @@ void CMasternode::Check()
 
 
     //once spent, stop doing the checks
+    if(addr.GetPort() != Params().GetDefaultPort()) {
+        activeState = MASTERNODE_BAD_PORT;
+        return;
+    }
+
+    //once spent, stop doing the checks
     if(activeState == MASTERNODE_VIN_SPENT) return;
 
 
