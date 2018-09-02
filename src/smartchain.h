@@ -29,7 +29,7 @@ public:
     CSmartContract(const CSmartContract &contract) :
         name(contract.name),
         author(contract.author),
-        supply(contract.supply),
+        supply(contract.supply)
     {}
 
     void SetNull()
