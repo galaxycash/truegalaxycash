@@ -74,7 +74,7 @@ OBJS= \
     obj/crypter.o \
     obj/key.o \
     obj/init.o \
-    obj/galaxycashd.o \
+    obj/truegalaxycashd.o \
     obj/keystore.o \
     obj/core.o \
     obj/main.o \
@@ -126,7 +126,9 @@ OBJS= \
     obj/masternode-payments.o \
     obj/rpcmasternode.o \
     obj/spork.o \
-    obj/blockfile.o
+    obj/blockfile.o \
+    obj/leveldbwrapper.o \
+    obj/coins.o
 
 ifeq (${USE_WALLET}, 1)
     DEFS += -DENABLE_WALLET
@@ -140,7 +142,7 @@ ifeq (${USE_WALLET}, 1)
         obj/walletdb.o
 endif
 
-all: galaxycashd.exe
+all: truegalaxycashd.exe
 
 LIBS += $(CURDIR)/leveldb/libleveldb.a $(CURDIR)/leveldb/libmemenv.a
 DEFS += -I"$(CURDIR)/leveldb/include"
@@ -188,11 +190,11 @@ obj/%.o: crypto/%.c
 	  rm -f $(@:%.o=%.d)
 
 
-galaxycashd.exe: $(OBJS:obj/%=obj/%)
+truegalaxycashd.exe: $(OBJS:obj/%=obj/%)
 	$(LINK) $(xCXXFLAGS) -o $@ $^ $(xLDFLAGS) $(LIBS)
 
 clean:
-	-rm -f galaxycashd.exe
+	-rm -f truegalaxycashd.exe
 	-rm -f obj/*.o
 	-rm -f obj/*.P
 	-rm -f obj/build.h

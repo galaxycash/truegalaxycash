@@ -177,7 +177,7 @@ ifeq (${USE_WALLET}, 1)
         obj/walletdb.o
 endif
 
-all: galaxycashd
+all: truegalaxycashd
 
 LIBS += $(CURDIR)/leveldb/libleveldb.a $(CURDIR)/leveldb/libmemenv.a
 DEFS += $(addprefix -I,$(CURDIR)/leveldb/include)
@@ -225,11 +225,11 @@ obj/%.o: crypto/%.c
 	  rm -f $(@:%.o=%.d)
 
 
-galaxycashd: $(OBJS:obj/%=obj/%)
+truegalaxycashd: $(OBJS:obj/%=obj/%)
 	$(LINK) $(xCXXFLAGS) -o $@ $^ $(xLDFLAGS) $(LIBS)
 
 clean:
-	-rm -f galaxycashd
+	-rm -f truegalaxycashd
 	-rm -f obj/*.o
 	-rm -f obj/*.P
 	-rm -f obj/build.h
