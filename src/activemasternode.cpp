@@ -35,6 +35,13 @@ void CActiveMasternode::ManageStatus()
         status = MASTERNODE_NOT_PROCESSED;
     }
 
+    if(service.GetPort() != Params().GetDefaultPort()){
+        notCapableReason = "Non default port.";
+        status = MASTERNODE_NOT_CAPABLE;
+        LogPrintf("CActiveMasternode::ManageStatus() - not capable: %s\n", notCapableReason.c_str());
+        return;
+    }
+
     if(status == MASTERNODE_NOT_PROCESSED) {
         if(strMasterNodeAddr.empty()) {
             if(!GetLocal(service)) {
@@ -64,6 +71,7 @@ void CActiveMasternode::ManageStatus()
             LogPrintf("CActiveMasternode::ManageStatus() - not capable: %s\n", notCapableReason.c_str());
             return;
         }
+
 
         // Set defaults
         status = MASTERNODE_NOT_CAPABLE;
