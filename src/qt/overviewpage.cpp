@@ -431,7 +431,7 @@ void OverviewPage::updatePrices()
     uint32_t blocks = 24 * 60;
     uint32_t blocksPerNode = blocks / nodes;
     uint32_t dailyIncome = blocksPerNode * 0.8;
-    double ROI = ((((double) MN_COLLATERAL - (double) dailyIncome) / (double) MN_COLLATERAL)) * 100.0;
+    double ROI = ((double) dailyIncome / (double) MN_COLLATERAL) * 100.0;
 
 
     std::stringstream totbtcval;

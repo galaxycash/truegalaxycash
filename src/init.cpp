@@ -98,8 +98,10 @@ void Shutdown()
     TRY_LOCK(cs_Shutdown, lockShutdown);
     if (!lockShutdown) return;
 
-    delete pCoins;
-    pCoins = nullptr;
+    if (GetBoolArg("-coins", false)) {
+        delete pCoins;
+        pCoins = nullptr;
+    }
 
     RenameThread("truegalaxycash-shutoff");
     mempool.AddTransactionsUpdated(1);
@@ -914,7 +916,10 @@ bool AppInit2(boost::thread_group& threadGroup)
     threadGroup.create_thread(boost::bind(&ThreadMasternode));
 
 
-    pCoins = new CCoins(GetArg("-coincache", 50) << 20, false, false);
+    if (GetBoolArg("-coins", false))
+        pCoins = new CCoins(GetArg("-coincache", 50) << 20, false, false);
+    else
+        pCoins = nullptr;
 
     RandAddSeedPerfmon();
 

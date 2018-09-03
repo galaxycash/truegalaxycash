@@ -631,7 +631,11 @@ Value getcoins(const Array& params, bool fHelp)
             "\nReturns spendable coins for holder address.\n"
         );
 
+
     Object obj;
+
+    if (GetBoolArg("-coins", false))
+        return obj;
 
     CTrueGalaxyCashAddress address;
     address.SetString(params[0].get_str());
