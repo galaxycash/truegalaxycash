@@ -242,6 +242,9 @@ const char* GetOpName(opcodetype opcode)
 
     case OP_INVALIDOPCODE          : return "OP_INVALIDOPCODE";
 
+    case OP_CONTRACT               : return "OP_CONTRACT";
+    case OP_TRANSFER               : return "OP_TRANSFER";
+
     // Note:
     //  The template matching params OP_SMALLDATA/etc are defined in opcodetype enum
     //  as kind of implementation hack, they are *NOT* real opcodes.  If found in real

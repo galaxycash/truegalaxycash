@@ -1164,11 +1164,14 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
         {
             const CWalletTx* pcoin = &(*it).second;
 
+
+
             if (!IsFinalTx(*pcoin))
                 continue;
 
             if (fOnlyConfirmed && !pcoin->IsTrusted())
                 continue;
+
 
             if ((pcoin->IsCoinBase() || pcoin->IsCoinStake()) && pcoin->GetBlocksToMaturity() > 0)
                 continue;
@@ -1186,6 +1189,10 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
                     else
                         continue;
                 }
+
+                if (IsBurned((*it).first, i))
+                    continue;
+
 
                 if (!(pcoin->IsSpent(i)) && !IsLockedCoin((*it).first, i) && IsMine(pcoin->vout[i]) && pcoin->vout[i].nValue >= nMinimumInputValue &&
                 (!coinControl || !coinControl->HasSelected() || coinControl->IsSelected((*it).first, i)))
@@ -1219,6 +1226,10 @@ void CWallet::AvailableCoinsNoLocks(vector<COutput>& vCoins, bool fOnlyConfirmed
                 continue;
 
             for (unsigned int i = 0; i < pcoin->vout.size(); i++) {
+
+                if (IsBurned((*it).first, i))
+                    continue;
+
                 if (!(pcoin->IsSpent(i)) && IsMine(pcoin->vout[i]) && pcoin->vout[i].nValue >= nMinimumInputValue &&
                 (!coinControl || !coinControl->HasSelected() || coinControl->IsSelected((*it).first, i)))
                     vCoins.push_back(COutput(pcoin, i, nDepth));
@@ -1262,6 +1273,10 @@ void CWallet::AvailableCoinsFrom(const CTxDestination &from, vector<COutput>& vC
                         continue;
                 }
 
+                if (IsBurned((*it).first, i))
+                    continue;
+
+
                 CTxDestination destination;
                 if (ExtractDestination(pcoin->vout[i].scriptPubKey, destination))
                 {
@@ -1304,6 +1319,9 @@ void CWallet::AvailableCoinsForStaking(vector<COutput>& vCoins) const
             for (unsigned int i = 0; i < pcoin->vout.size(); i++) {
 
                 if (fMasterNode && pcoin->vout[i].nValue == (MasternodeCollateral(pindexBest->nHeight) * COIN))
+                    continue;
+
+                if (IsBurned((*it).first, i))
                     continue;
 
                 if (!IsLockedCoin((*it).first, i) && !(pcoin->IsSpent(i)) && IsMine(pcoin->vout[i]) && pcoin->vout[i].nValue >= nMinimumInputValue)

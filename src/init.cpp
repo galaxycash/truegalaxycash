@@ -98,7 +98,7 @@ void Shutdown()
     TRY_LOCK(cs_Shutdown, lockShutdown);
     if (!lockShutdown) return;
 
-    if (GetBoolArg("-coins", false)) {
+    if (fCoins) {
         delete pCoins;
         pCoins = nullptr;
     }
@@ -905,19 +905,12 @@ bool AppInit2(boost::thread_group& threadGroup)
         }
     }
 
-    //lite mode disables all Masternode and Anonsend related functionality
-    fLiteMode = false; //GetBoolArg("-litemode", false);
-    if(fMasterNode && fLiteMode){
-        return InitError("You can not start a masternode in litemode");
-    }
-
-    LogPrintf("fLiteMode %d\n", fLiteMode);
-
     threadGroup.create_thread(boost::bind(&ThreadMasternode));
 
 
-    if (GetBoolArg("-coins", false))
-        pCoins = new CCoins(GetArg("-coincache", 50) << 20, false, false);
+    fCoins = GetBoolArg("-coins", false);
+    if (fCoins)
+        pCoins = new CCoins(0, false, fReindex);
     else
         pCoins = nullptr;
 

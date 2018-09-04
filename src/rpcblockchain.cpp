@@ -634,7 +634,7 @@ Value getcoins(const Array& params, bool fHelp)
 
     Object obj;
 
-    if (GetBoolArg("-coins", false))
+    if (!fCoins)
         return obj;
 
     CTrueGalaxyCashAddress address;

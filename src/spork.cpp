@@ -32,8 +32,6 @@ std::map<int, CSporkMessage> mapSporksActive;
 
 void ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
 {
-    if(fLiteMode) return; //disable all anonsend/masternode related functionality
-
     if (strCommand == "spork")
     {
         //LogPrintf("ProcessSpork::spork\n");

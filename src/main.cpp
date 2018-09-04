@@ -73,9 +73,9 @@ bool fReindex = false;
 bool fHaveGUI = false;
 bool fUseDefaultKey = false;
 bool fMasterNode = false;
+bool fCoins = false;
 string strMasterNodePrivKey = "";
 string strMasterNodeAddr = "";
-bool fLiteMode = false;
 int64_t enforceMasternodePaymentsTime = 4085657524;
 int nMasternodeMinProtocol = 0;
 bool fMasternodeSoftLock = false;
@@ -1890,7 +1890,7 @@ bool CBlock::DisconnectBlock(CTxDB& txdb, CBlockIndex* pindex)
     BOOST_FOREACH(CTransaction& tx, vtx)
         SyncWithWallets(tx, this, false);
 
-    if (GetBoolArg("-coins", false))
+    if (fCoins)
         pCoins->DisconnectBlock(this);
 
     return true;
@@ -2042,7 +2042,7 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
     BOOST_FOREACH(CTransaction& tx, vtx)
         SyncWithWallets(tx, this);
 
-    if (GetBoolArg("-coins", false))
+    if (fCoins)
         pCoins->ConnectBlock(this);
 
     return true;
@@ -3731,7 +3731,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
 
     else if (strCommand == "getcoins")
     {
-        if (GetBoolArg("-coins", true)) {
+        if (fCoins) {
             unsigned int num = 0;
             vRecv >> num;
 
@@ -3756,7 +3756,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
 
     else if (strCommand == "gettxes")
     {
-        if (GetBoolArg("-coins", true)) {
+        if (fCoins) {
             unsigned int num = 0;
             vRecv >> num;
 

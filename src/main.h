@@ -97,7 +97,7 @@ extern bool fHaveGUI;
 extern int nMiningAlgo;
 extern bool fUseDefaultKey;
 extern bool fMasterNode;
-extern bool fLiteMode;
+extern bool fCoins;
 extern int64_t enforceMasternodePaymentsTime;
 extern std::string strMasterNodeAddr;
 extern int nMasternodeMinProtocol;
@@ -171,6 +171,10 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx, bool fLimitFree,
                         bool* pfMissingInputs, bool ignoreFees=false);
 bool AcceptableInputs(CTxMemPool& pool, const CTransaction &txo, bool fLimitFree,
                         bool* pfMissingInputs);
+
+bool IsBurned(const uint256 &hash, uint32_t index);
+bool IsBurned(const CTxIn &vin);
+bool IsBurned(const COutPoint &coin);
 
 
 int GetInputAge(CTxIn& vin);
