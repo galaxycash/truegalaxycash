@@ -103,6 +103,7 @@ void Shutdown()
         pCoins = nullptr;
     }
 
+
     RenameThread("truegalaxycash-shutoff");
     mempool.AddTransactionsUpdated(1);
     StopRPCThreads();

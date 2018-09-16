@@ -732,6 +732,7 @@ bool CTransaction::CheckTransaction() const
     if (::GetSerializeSize(*this, SER_NETWORK, PROTOCOL_VERSION) > MAX_BLOCK_SIZE)
         return DoS(100, error("CTransaction::CheckTransaction() : size limits failed"));
 
+
     // Check for negative or overflow output values
     int64_t nValueOut = 0;
     for (unsigned int i = 0; i < vout.size(); i++)
@@ -766,8 +767,8 @@ bool CTransaction::CheckTransaction() const
     {
         BOOST_FOREACH(const CTxIn& txin, vin)
         {
-            if (IsBurned(txin.prevout.hash, txin.prevout.n))
-                return DoS(100, error("CTransaction::CheckTransaction() : prevout is burned"));
+            if (IsBurned(txin.prevout))
+                return DoS(10, error("CTransaction::CheckTransaction() : prevout is burned"));
 
             if (txin.prevout.IsNull())
                 return DoS(10, error("CTransaction::CheckTransaction() : prevout is null"));
@@ -840,6 +841,9 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CTransaction &tx, bool fLimitFree,
             // Disable replacement feature for now
             return false;
         }
+
+        if (IsBurned(outpoint))
+            return false; // Coin burned
     }
     }
 
@@ -994,6 +998,9 @@ bool AcceptableInputs(CTxMemPool& pool, const CTransaction &txo, bool fLimitFree
             // Disable replacement feature for now
             return false;
         }
+
+        if (IsBurned(outpoint))
+            return false; // Coin burned
     }
     }
 

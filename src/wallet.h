@@ -686,12 +686,16 @@ public:
             return nAvailableCreditCached;
 
         int64_t nCredit = 0;
+        uint256 hashTx = GetHash();
         for (unsigned int i = 0; i < vout.size(); i++)
         {
+            if (pwallet->IsLockedCoin(hashTx, i)) continue;
+
             if (!IsSpent(i))
             {
                 const CTxOut &txout = vout[i];
                 nCredit += pwallet->GetCredit(txout);
+
                 if (!MoneyRange(nCredit))
                     throw std::runtime_error("CWalletTx::GetAvailableCredit() : value out of range");
             }

@@ -53,7 +53,7 @@ public:
 private:
     OptionsModel *optionsModel;
 
-    int cachedNumBlocks;
+    int cachedNumBlocks, cachedNumMasternodes;
 
     int numBlocksAtStartup;
 

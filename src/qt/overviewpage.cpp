@@ -427,13 +427,6 @@ void OverviewPage::updatePrices()
     double TOTAL_BTC = TGCH_BALANCE * TGCH_BTC;
     double TOTAL_ETH = TGCH_BALANCE * TGCH_ETH;
 
-    uint32_t nodes = mnodeman.CountEnabled() ? mnodeman.CountEnabled() : 1;
-    uint32_t blocks = 24 * 60;
-    uint32_t blocksPerNode = blocks / nodes;
-    uint32_t dailyIncome = blocksPerNode * 0.8;
-    double ROI = ((double) dailyIncome / (double) MN_COLLATERAL) * 100.0;
-
-
     std::stringstream totbtcval;
     totbtcval << std::fixed << setprecision(8) << TOTAL_BTC;
     stats += std::string("\nBitcoin Value:") + totbtcval.str() + std::string(" ");
@@ -442,34 +435,6 @@ void OverviewPage::updatePrices()
     totethval << std::fixed << setprecision(8) << TOTAL_ETH;
     stats += std::string("Ethereum Value:") + totethval.str() + std::string(" ");
 
-
-    std::stringstream totdval;
-    totdval << std::fixed << setprecision(1) << (blocksPerNode * 0.8);
-    stats += std::string("\nDaily income:") + totdval.str() + std::string(" TGCH ");
-
-    std::stringstream totwval;
-    totwval << std::fixed << setprecision(1) << (blocksPerNode * 7 * 0.8);
-    stats += std::string("Weekly income:") + totwval.str() + std::string(" TGCH ");
-
-    std::stringstream totmval;
-    totmval << std::fixed << setprecision(1) << (blocksPerNode * 30 * 0.8);
-    stats += std::string("Monthly income:") + totmval.str() + std::string(" TGCH ");
-
-    std::stringstream roidval;
-    roidval << std::fixed << setprecision(1) << (ROI);
-    stats += std::string("\nDaily ROI:") + roidval.str() + std::string("% ");
-
-    std::stringstream roiwval;
-    roiwval << std::fixed << setprecision(1) << (ROI * 7);
-    stats += std::string("Weekly ROI:") + roiwval.str() + std::string("% ");
-
-    std::stringstream roimval;
-    roimval << std::fixed << setprecision(1) << (ROI * 30);
-    stats += std::string("Monthly ROI:") + roimval.str() + std::string("% ");
-
-    std::stringstream roiyval;
-    roiyval << std::fixed << setprecision(1) << (ROI * 30 * 12);
-    stats += std::string("Yearly ROI:") + roiyval.str() + std::string("% ");
 
     ui->priceStats->setText(QString::fromStdString(stats));
 }

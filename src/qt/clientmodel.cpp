@@ -18,7 +18,7 @@ static const int64_t nClientStartupTime = GetTime();
 
 ClientModel::ClientModel(OptionsModel *optionsModel, QObject *parent) :
     QObject(parent), optionsModel(optionsModel),
-    cachedNumBlocks(0), numBlocksAtStartup(-1), pollTimer(0)
+    cachedNumBlocks(0), cachedNumMasternodes(0), numBlocksAtStartup(-1), pollTimer(0)
 {
     pollTimer = new QTimer(this);
     pollTimer->setInterval(MODEL_UPDATE_DELAY);
@@ -87,6 +87,7 @@ void ClientModel::updateTimer()
     // Some quantities (such as number of blocks) change so fast that we don't want to be notified for each change.
     // Periodically check and update with a timer.
     int newNumBlocks = getNumBlocks();
+    int newNumMasternodes = getNumMasternodes();
 
     if(cachedNumBlocks != newNumBlocks)
     {
@@ -95,6 +96,12 @@ void ClientModel::updateTimer()
         emit numBlocksChanged(newNumBlocks);
     }
 
+    if(cachedNumMasternodes != newNumMasternodes)
+    {
+        cachedNumMasternodes = newNumMasternodes;
+
+        emit numMasternodesChanged(newNumMasternodes);
+    }
     emit bytesChanged(getTotalBytesRecv(), getTotalBytesSent());
 }
 
@@ -105,7 +112,7 @@ void ClientModel::updateNumConnections(int numConnections)
 
 void ClientModel::updateNumMasternodes(int numMasternodes)
 {
-    emit numConnectionsChanged(numMasternodes);
+    emit numMasternodesChanged(numMasternodes);
 }
 
 void ClientModel::updateAlert()
