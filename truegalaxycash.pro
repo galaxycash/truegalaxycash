@@ -469,7 +469,7 @@ isEmpty(OPENSSL_LIB_PATH) {
 }
 
 isEmpty(OPENSSL_INCLUDE_PATH) {
-    macx:OPENSSL_INCLUDE_PATH = /usr/local/opt/include
+    macx:OPENSSL_INCLUDE_PATH = /usr/local/opt/include/openssl/include
 }
 
 windows:DEFINES += WIN32
