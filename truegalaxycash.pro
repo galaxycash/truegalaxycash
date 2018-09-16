@@ -42,6 +42,7 @@ macx:OBJECTS_DIR = build_macx
 macx:MOC_DIR = build_macx
 macx:UI_DIR = build_macx
 
+QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.11
 
 # use: qmake "RELEASE=1"
 contains(RELEASE, 1) {
