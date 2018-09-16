@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleExecutable</key>
-	<string>TrueGalaxyCash</string>
+	<string>TrueGalaxyCash-Qt</string>
 	<key>CFBundleGetInfoString</key>
 	<string>TrueGalaxyCash</string>
 	<key>CFBundleIconFile</key>
