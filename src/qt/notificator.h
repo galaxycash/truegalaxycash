@@ -73,7 +73,8 @@ private:
 #endif
     void notifySystray(Class cls, const QString &title, const QString &text, const QIcon &icon, int millisTimeout);
 #ifdef Q_OS_MAC
-    void notifyGrowl(Class cls, const QString &title, const QString &text, const QIcon &icon);
+ //   void notifyGrowl(Class cls, const QString &title, const QString &text, const QIcon &icon);
+    void notifyMacUserNotificationCenter(Class cls, const QString &title, const QString &text, const QIcon &icon);
 #endif
 };
 
