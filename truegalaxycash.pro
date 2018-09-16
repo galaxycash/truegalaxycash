@@ -13,6 +13,7 @@ DEFINES += BOOST_THREAD_USE_LIB BOOST_SPIRIT_THREADSAFE BOOST_NO_CXX11_SCOPED_EN
 CONFIG += c++11
 CONFIG += no_include_pwd
 CONFIG += thread static
+macx:CONFIG += app_bundle
 
 greaterThan(QT_MAJOR_VERSION, 4) {
     QT += widgets
