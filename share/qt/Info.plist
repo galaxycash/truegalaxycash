@@ -9,7 +9,7 @@
 	<key>CFBundleIconFile</key>
 	<string>truegalaxycash.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.galaxycash.TrueGalaxyCash-Qt</string>
+	<string>com.truegalaxycash.TrueGalaxyCash-Qt</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>NOTE</key>
