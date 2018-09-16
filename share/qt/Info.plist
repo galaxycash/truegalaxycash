@@ -12,8 +12,6 @@
 	<string>com.galaxycash.TrueGalaxyCash-Qt</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
-	<key>CFBundleSignature</key>
-	<string>????</string>
 	<key>NOTE</key>
 	<string>Wallet for TrueGalaxyCash X12+POS+MasterNodes</string>
 	<key>NSPrincipalClass</key>
