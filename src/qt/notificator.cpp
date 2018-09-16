@@ -303,6 +303,16 @@ void Notificator::notifyMacUserNotificationCenter(Class cls, const QString &titl
 
 void Notificator::notify(Class cls, const QString &title, const QString &text, const QIcon &icon, int millisTimeout)
 {
+#ifdef Q_OS_MAC
+    if(cls == Critical)
+    {
+        // Fall back to old fashioned pop-up dialog if critical and no other notification available
+        QMessageBox::critical(parent, title, text, QMessageBox::Ok, QMessageBox::Ok);
+        return;
+    }
+
+    notifyMacUserNotificationCenter(cls, title, text, icon);
+#else
     switch(mode)
     {
 #ifdef USE_DBUS
@@ -313,15 +323,6 @@ void Notificator::notify(Class cls, const QString &title, const QString &text, c
     case QSystemTray:
         notifySystray(cls, title, text, icon, millisTimeout);
         break;
-#ifdef Q_OS_MAC
-    case UserNotificationCenter:
-        notifyMacUserNotificationCenter(cls, title, text, icon);
-        break;
-    case Growl12:
-    case Growl13:
-       // notifyGrowl(cls, title, text, icon);
-        break;
-#endif
     default:
         if(cls == Critical)
         {
@@ -330,4 +331,5 @@ void Notificator::notify(Class cls, const QString &title, const QString &text, c
         }
         break;
     }
+#endif
 }
