@@ -465,12 +465,13 @@ isEmpty(BOOST_INCLUDE_PATH) {
 }
 
 isEmpty(OPENSSL_LIB_PATH) {
-    macx:OPENSSL_LIB_PATH = /usr/local/opt/lib
+    macx:OPENSSL_LIB_PATH = /usr/local/opt/openssl/lib
 }
 
 isEmpty(OPENSSL_INCLUDE_PATH) {
-    macx:OPENSSL_INCLUDE_PATH = /usr/local/opt/include/openssl/include
+    macx:OPENSSL_INCLUDE_PATH = /usr/local/opt/openssl/include
 }
+
 
 windows:DEFINES += WIN32
 windows:RC_FILE = src/qt/res/truegalaxycash-qt.rc
